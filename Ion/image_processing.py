@@ -32,14 +32,20 @@ def window_capture(windowName='Andor'):
     saveDC = mfcDC.CreateCompatibleDC()
     # 创建bigmap准备保存图片
     saveBitMap = win32ui.CreateBitmap()
-    # 获取监控器信息
+
+
+    # get physical monitor information
     """
     MoniterDev = win32api.EnumDisplayMonitors(None, None)
     w = MoniterDev[0][2][2]
     h = MoniterDev[0][2][3]
     """
-    w = 960
-    h = 1080
+
+    # but sometimes there is scaled in the real resolution
+    # there it's more important to get actual resolution
+
+    w = int(win32api.GetSystemMetrics(0)/2)
+    h = win32api.GetSystemMetrics(1)
     # print w,h　　　#图片大小
     # 为bitmap开辟空间
     saveBitMap.CreateCompatibleBitmap(mfcDC, w, h)
