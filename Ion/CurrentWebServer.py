@@ -1,6 +1,13 @@
 
 import time, socket, threading
-import tornado
+import json
+
+import tornado.ioloop
+import tornado.web
+import tornado.httpserver
+import tornado.websocket
+
+from tornado.ioloop import PeriodicCallback
 from CurrentSupply import current_supply
 
 """
@@ -10,10 +17,9 @@ TODO:
     3.auto detect oven usage
     4.adjust oven current 
 """
-import tornado
 
 CURR = current_supply('com6')
-CURR.set_up(curr=3.2, vol=2)
+CURR.set_up(curr=3.0, vol=2)
 
 MAX_LISTEN = 10
 SOCK_PORT = 6789
