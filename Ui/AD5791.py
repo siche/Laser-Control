@@ -1,6 +1,5 @@
 
-import os
-import sys
+import os, sys
 sys.path.append('./')
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -42,7 +41,7 @@ class AD5791:
         self.serial_num = ser
         # dll_path = os.path.join(os.getcwd(),dll)
         # print(dll_path)
-        dll_path = 'D:/Documents/208Code/LaserLock/Ui/'+dll
+        dll_path = os.path.join(os.getcwd(),dll)
         self.dll = cdll.LoadLibrary(dll_path)
         # Close the connections if already exist
         self.dll.USBIO_CloseDeviceByNumber(ser)

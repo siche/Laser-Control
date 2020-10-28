@@ -233,8 +233,11 @@ def has_ion(plt_option = False, bw_threshold = 160, ion_area = 15, region = [200
         plt.imshow(img_bw)
         plt.draw()
         plt.pause(1e-17)
-
-    return (ion_num > 0)
+    else:
+        if img_bw.sum()>30:
+            ion_num = -1
+            
+    return ion_num
 
 if __name__ == "__main__":
     import time

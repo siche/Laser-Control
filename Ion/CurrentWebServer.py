@@ -1,10 +1,18 @@
 
-import time
-import socket
+import time, socket, threading
+import tornado
 from CurrentSupply import current_supply
-import threading
 
-CURR = current_supply('com8')
+"""
+TODO: 
+    1.use tornao instead of mutiple thread 
+    2.statics the time of oven use when it's over certain time turn off the oven for pretection
+    3.auto detect oven usage
+    4.adjust oven current 
+"""
+import tornado
+
+CURR = current_supply('com6')
 CURR.set_up(curr=3.2, vol=2)
 
 MAX_LISTEN = 10
