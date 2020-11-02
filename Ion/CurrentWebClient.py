@@ -46,7 +46,7 @@ class current_web():
             print('Beep Failed')
 
     def runServer(self):
-        cmd = 'python \"D:/Documents/208Code/LaserLock/Ion/CurrentWebServer.py\"'
+        cmd = 'python \"D:/Document/GitHub/Laser-Control/Ion/CurrentWebServer.py\"'
         os.system(cmd)
     
     def exit(self,signum, frame):
