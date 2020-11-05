@@ -18,7 +18,7 @@ TODO:
     4.adjust oven current 
 """
 
-CURR = current_supply('com6')
+CURR = current_supply('com9')
 CURR.set_up(curr=3.1, vol=2)
 
 MAX_LISTEN = 10

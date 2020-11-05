@@ -1,7 +1,7 @@
 
 from serial import Serial
 import serial
-import time
+import time, signal, atexit, sys
 
 class current_supply(object):
     def __init__(self, com='Com8'):
@@ -22,14 +22,16 @@ class current_supply(object):
         self.max_vol = 3
         self.set_current_limit(self.max_current)
         self.set_voltage_limit(self.max_vol)
-        self.set_up(3.2,3)
+        self.set_up(3.1,3)
         self.off()
+        signal.signal(signal.SIGINT, self.exit)
+        signal.signal(signal.SIGTERM, self.exit)
 
     def is_completed(self):
         self.ser.write(b'*OPC?\r\n')
         status = self.ser.readline()
-        print(status)
         time.sleep(0.1)
+        # print('command completed:%s' % (status == b'1\n'))
         return (status == b'1\n')
 
     def on(self):
@@ -127,4 +129,8 @@ class current_supply(object):
             self.ser.write(b':SYST:BEEP\r\n')
             time.sleep(0.1)
             t = t +0.1
-        
+    
+    def exit(self):
+        self.off()
+        self.ser.close()
+        sys.exit()
