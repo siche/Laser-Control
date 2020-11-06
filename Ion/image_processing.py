@@ -236,7 +236,8 @@ def has_ion(bw_threshold = 160, ion_area = 15, region = [350,770,240,660],debug 
     
     if ion_num==0 and img_bw.sum()>30:
         ion_num = -1
-            
+
+    print('Ion number:%s' % ion_num)        
     return ion_num
 
 if __name__ == "__main__":
