@@ -24,9 +24,9 @@ class IonLoader(object):
 
     def load_ion(self):
         self.curr.on()
-        self.flip_mirror.on()
-        time.sleep(0.3)
         self.flip_mirror.off()
+        time.sleep(0.3)
+        self.flip_mirror.on()
         time.sleep(1)
 
         t1 = time.time()
@@ -46,7 +46,7 @@ class IonLoader(object):
             return False
 
         if has_ion():    
-            self.flip_mirror.off()
+            self.flip_mirror.on()
             self.curr.off()
             self.shutter_370.off()
             self.shutter_399.off()
