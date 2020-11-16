@@ -14,6 +14,7 @@ class IonLoader(object):
         self.flip_mirror = shutter(com=1)
         self.shutter_399 = shutter(com=2)
         self.curr = current_web()
+        self.curr.se
         self.isLoading = True
 
         signal.signal(signal.SIGINT, self.exit)
