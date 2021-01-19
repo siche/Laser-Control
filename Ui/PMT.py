@@ -1,18 +1,19 @@
 
+from PyQt5.QtGui import QFont, QIcon
+import ctypes
+from ttl_client import shutter
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QGridLayout, QLabel, QComboBox, QMessageBox, QLayout
+from serial import Serial
+import serial.tools.list_ports
+import numpy as np
 import sys
 import time
 import pyqtgraph as pg
 pg.setConfigOption('background', 'w')
-import numpy as np
-import serial.tools.list_ports
 
-from serial import Serial
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QGridLayout, QLabel, QComboBox, QMessageBox, QLayout
-from PyQt5.QtGui import QFont,QIcon
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 
 # make the icon normal in the windows taskbar
-import ctypes
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 
 
@@ -22,6 +23,8 @@ myfont.setBold(True)
 data_len = 100
 
 # 当数据更新之后会发送一个signal
+
+
 class PMTWorker(QThread):
     sinOut = pyqtSignal(list)
 
@@ -43,7 +46,6 @@ class PMTWorker(QThread):
             self.working = False
             print('Com Port is not selected')
 
-        
     # delete something when thread ends
 
     def __del__(self):
@@ -62,7 +64,7 @@ class PMTWorker(QThread):
                 pmt_data = self._ser.read(2)
                 num = int.from_bytes(pmt_data, byteorder='little')
                 count += num
-            
+
             temp_mean = np.mean(data[0])
             temp_stdv = np.std(data[0])
 
@@ -79,13 +81,14 @@ class PMTWorker(QThread):
 
 
 class PMTCtrl(QWidget):
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super(PMTCtrl, self).__init__(parent)
-        
+
         self.initUi()
         self._com = None
         self.setWindowIcon(QIcon('light.png'))
         self.setWindowTitle('PMT')
+        self.shutter = shutter(com=1)
 
         """ move to the connect signal
         self.thread = PMTWorker(self._com)
@@ -93,23 +96,24 @@ class PMTCtrl(QWidget):
         # self.thread.sinOut.connect(self.mouseMoved)
         self.thread.start()
         """
+
     def initUi(self):
 
         # plot figure window
         PltWindow = pg.PlotWidget()
-        PltWindow.showGrid(x=True,y=True)
+        PltWindow.showGrid(x=True, y=True)
         # PltWindow.setClipToView(True)
         PltWindow.setFont(myfont)
 
         self.PltText = pg.TextItem()
         self.PltText2 = pg.TextItem()
-    
+
         PltWindow.addItem(self.PltText)
         PltWindow.addItem(self.PltText2)
 
         layout = QGridLayout()
         layout.addWidget(PltWindow, 1, 0, 3, 4)
-        
+
         # self.fig = PltWindow.addPlot()
         # self.fig.setDownsampling(mode='peak')
         # self.fig.setClipToView(True)
@@ -118,14 +122,13 @@ class PMTCtrl(QWidget):
         self.curve = self.fig.plot([0]*100)
         self.fig.getAxis('bottom').tickFont = myfont
         self.fig.getAxis('left').tickFont = myfont
-        
+
         # connection and status button
         btn1 = QComboBox()
         btn1.addItems(['com16'])
         ports = [item[0] for item in list(serial.tools.list_ports.comports())]
         btn1.addItems(ports)
-        btn1.setFont(QFont('Arial',12,24))
-
+        btn1.setFont(QFont('Arial', 12, 24))
 
         # connection button
         btn2 = QPushButton('Connect')
@@ -134,19 +137,38 @@ class PMTCtrl(QWidget):
         btn2.setStyleSheet('background-color:red')
         btn2.toggled.connect(self.change_switch)
 
-        btn2.setFont(QFont('Arial',12,24))
+        btn2.setFont(QFont('Arial', 12, 24))
 
-        layout.addWidget(btn1,0,0,1,1)
-        layout.addWidget(btn2,0,1,1,1)
+        btn3 = QPushButton('CCD')
+        btn3.setStyleSheet('background-color:blue')
+        btn3.clicked.connect(lambda: self.on_off(0))
+        btn3.setFont(QFont('Arial', 12, 24))
+
+
+        btn4 = QPushButton('PMT')
+        btn4.setStyleSheet('background-color:green')
+        btn4.clicked.connect(lambda: self.on_off(1))
+        btn4.setFont(QFont('Arial', 12, 24))
+
+        layout.addWidget(btn1, 0, 0, 1, 1)
+        layout.addWidget(btn2, 0, 1, 1, 1)
+        layout.addWidget(btn3, 0, 2, 1, 1)
+        layout.addWidget(btn4, 0, 3, 1, 1)
         layout.setSizeConstraint(QLayout.SetFixedSize)
 
         # self.setFixedSize(200,256)
         self.comPicker = btn1
         self.connect = btn2
-    
+
         self.setLayout(layout)
         # self.setFixedHeight(450)
         # self.move_slot = pg.SignalProxy(self.fig.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
+
+    def on_off(self, num = 3):
+        if num==0:
+            self.shutter.on()
+        if num==1:
+            self.shutter.off()
 
     def change_switch(self):
 
@@ -173,8 +195,9 @@ class PMTCtrl(QWidget):
                     self.connect.setText('Connected')
                 # warning if the port is in use
                 except:
-                    QMessageBox.warning(self,'Warning','Permission Denied:Selected ComPort is in Use')    
-        
+                    QMessageBox.warning(
+                        self, 'Warning', 'Permission Denied:Selected ComPort is in Use')
+
         else:
             self.connect.setChecked(False)
             self.connect.setStyleSheet('background-color:red')
@@ -187,8 +210,9 @@ class PMTCtrl(QWidget):
 
     def update_plot(self, data):
         if self.connect.isChecked():
-            self.curve.setData(data[0][1:],pen=pg.mkPen(width=2.5,color='r'))
-            self.PltText.setHtml("<p style='font-size: 10pt; font-family:Arial; color: black'><strong> Count = %0.2f</strong></p>" % data[0][-1])
+            self.curve.setData(data[0][1:], pen=pg.mkPen(width=2.5, color='r'))
+            self.PltText.setHtml(
+                "<p style='font-size: 10pt; font-family:Arial; color: black'><strong> Count = %0.2f</strong></p>" % data[0][-1])
             self.PltText.setPos(85, 0.9*max(data[0]))
     """
     def timer(self, func, interval):
@@ -207,6 +231,8 @@ class PMTCtrl(QWidget):
                     int(mousePoint.x()), data[0][int(np.floor(mousePoint.y()))]))
                 self.PltText2.setPos(mousePoint.x()-5,mousePoint.y())
     """
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
