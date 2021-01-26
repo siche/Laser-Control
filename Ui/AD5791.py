@@ -125,7 +125,7 @@ class AD5791Ctrl(QGroupBox):
         self.level.setChecked(False)
         
 
-    def setRange(self, low=1.4, upper=5.0):
+    def setRange(self, low=3.5, upper=5.0):
         self.value.setRange(low, upper)
 
     def set_connect(self):
@@ -151,11 +151,11 @@ class AD5791Ctrl(QGroupBox):
         self.value.setValue(self.device.read_voltage())
     def changeLevel(self):
         if self.level.isChecked():
-            self.value.setValue(3.5)
+            self.value.setValue(4.8)
             self.level.setStyleSheet("background-color: green")
             self.level.setText("High")
         else:
-            self.value.setValue(1.4)
+            self.value.setValue(3)
             self.level.setStyleSheet("background-color: red")
             self.level.setText("Low")
     def setHighLevel(self, state):
