@@ -88,7 +88,7 @@ class PMTCtrl(QWidget):
         self._com = None
         self.setWindowIcon(QIcon('light.png'))
         self.setWindowTitle('PMT')
-        self.shutter = shutter(com=1)
+        # self.shutter = shutter(com=1)
 
         """ move to the connect signal
         self.thread = PMTWorker(self._com)
