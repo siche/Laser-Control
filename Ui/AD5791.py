@@ -64,7 +64,7 @@ class AD5791:
         self.dll.USBIO_SPIWrite(self.device_num, None, 0, (0x200012).to_bytes(3, byteorder="big"), 3)
     def set_voltage(self, Vout):
         """The Vout set to the DAC should exceed \pm 10V"""
-        if abs(Vout)>10.0000000001:
+        if abs(Vout)>10.0001:
             print("Voltage over range!")
         else:
             self.dll.USBIO_SPIWrite(self.device_num, None, 0, ((0x01<<20) + self.data(Vout)).to_bytes(3, byteorder="big"), 3)
@@ -125,7 +125,7 @@ class AD5791Ctrl(QGroupBox):
         self.level.setChecked(False)
         
 
-    def setRange(self, low=3.5, upper=5.0):
+    def setRange(self, low=3.5, upper=12.0):
         self.value.setRange(low, upper)
 
     def set_connect(self):
@@ -151,11 +151,11 @@ class AD5791Ctrl(QGroupBox):
         self.value.setValue(self.device.read_voltage())
     def changeLevel(self):
         if self.level.isChecked():
-            self.value.setValue(5.0)
+            self.value.setValue(10.0)
             self.level.setStyleSheet("background-color: green")
             self.level.setText("High")
         else:
-            self.value.setValue(3)
+            self.value.setValue(3.6)
             self.level.setStyleSheet("background-color: red")
             self.level.setText("Low")
     def setHighLevel(self, state):
